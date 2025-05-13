@@ -5,84 +5,67 @@
   <br />
 </p>
 
-# General Guidance
+# Contributing
 
-You can contribute to this project in the following ways:
+You can contribute this project in the following ways:
 
-- Try out the master branch and provide feedback
-- File a [bug report] or [propose a feature]
-- Open a PR for bug fixes or implement requested features
+- File a [bug report] or propose a feature
+- Open a PR for bug fixes or implementing requested features
 - Give feedback to opened issues/pull requests
-- Contribute documentation in the [sentry-doc repo]
+- Test the latest version - `gem 'sentry-raven', github: 'getsentry/raven-ruby'`
+- Contribute documentation in the [document repo]
+
 
 And if you have any questions, please feel free to reach out on [Discord].
 
-## Develop This Project With Multi-root Workspaces
 
-If you use editors that support [VS Code-style multi-root workspaces](https://code.visualstudio.com/docs/editor/multi-root-workspaces),
-such as VS Code, Cursor...etc., opening the editor with `sentry-ruby.code-workspace` file will provide a better development experience.
+[bug report]: https://github.com/getsentry/raven-ruby/issues/new?template=bug_report.md
+[document repo]: https://github.com/getsentry/sentry-docs
+[Discord]: https://discord.gg/Ww9hbqr
 
-## Working in a devcontainer
+## How To Contribute
 
-If you use [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension, you can open the project with the devcontainer by running `Remote-Containers: Reopen in Container` command.
+### Running Tests
 
-The devcontainer is configured with `.devcontainer/.env` file, that you need to create:
+#### RAILS_VERSION
 
-```bash
-cp .devcontainer/.env.example .devcontainer/.env
+Because this SDK supports multiple versions of Rails, or even without Rails, you might want to run your test against different versions of Rails.
+
+You can do this by changing the `RAILS_VERSION` environment variable:
+
+
+```
+$ echo RAILS_VERSION=6.0
+$ bundle update # this is necessary if you're switching between Rails versions
+$ bundle exec rake
 ```
 
-This file defines which specific image and Ruby version will be used to run the code. Edit it whenever you need to use a different image or Ruby version.
+If not specified, it runs tests against `Rails 5.2`. 
 
-## Contribute To Individual Gems
+And if you don't want to run the Rails related test cases, you can use `RAILS_VERSION=0`
 
-- Install the dependencies of a specific gem by running `bundle` in it's subdirectory. I.e:
-  ```bash
-  cd sentry-sidekiq
-  bundle install
-  ```
-- Install any additional dependencies. `sentry-sidekiq` assumes you have `redis` running.
-- Use `bundle exec rake` to run tests.
-  - In `sentry-rails`, you can use `RAILS_VERSION=version` to specify the Rails version to test against. Default is `7.0`
-  - In `sentry-sidekiq`, you can use `SIDEKIQ_VERSION=version` to specify what version of Sidekiq to install when you run `bundle install`. Default is `7.0`
-- Use example apps under the `example` or `examples` folder to test the change. (Remember to change the DSN first)
-- To learn more about `sentry-ruby`'s structure, you can read the [Sentry SDK spec]
+```
+$ RAILS_VERSION=0 bundle exec rake # runs without Rails related test cases
+```
 
-## Write Your Sentry Extension
+### Testing Your Change Against Example Rails Apps
 
-Please read the [extension guideline] to learn more. Feel free to open an issue if you find anything missing.
+We have a few example apps for different Rails versions under the `/examples` folder. You can use them to perform an end-to-end testing on your changes (just remember to change the DSN to your project's).
 
-# Release SDK Gem
-
-## Before the Release
-
-1. Run the example app(s) of the gem and make sure all the events are reported successfully.
-2. Update the changelog's latest `Unreleased` title with the target version.
-
-### Minor-version releases
-
-- Make sure all the new features are documented properly in the changelog. This includes but not limited to:
-  - Explanation of the feature.
-  - Sample code for the feature.
-  - Expected changes on the SDK's behavior and/or on the reported events.
-  - Some related screenshots.
-- Prepare a PR in the [sentry-doc repo] to update relevant content depending on the changes in the new release.
-
-### Major-version releases
-
-In addition to all the steps listed above, you also need to:
-
-- Write a migration guide to
-  - Outline the major changes done in this release.
-  - Explain why upgrading is beneficial.
-  - List all the breaking changes and help users make related changes in their apps.
-- Update gem READMEs.
-- May need to check related wizard files in the [sentry-doc repo].
+At this moment, we recommend testing against the [Rails 6 example](https://github.com/getsentry/raven-ruby/tree/master/examples/rails-6.0) first. Please read its readme to see what kind of testing you can perform with it.
 
 
-[bug report]: https://github.com/getsentry/sentry-ruby/issues/new?template=bug_report.md
-[propose a feature]: https://github.com/getsentry/sentry-ruby/issues/new?template=feature_request.md
-[extension guideline]: https://github.com/getsentry/sentry-ruby/blob/master/EXTENSION.md
-[Sentry SDK spec]: https://develop.sentry.dev/sdk/unified-api/
-[sentry-doc repo]: https://github.com/getsentry/sentry-docs
-[Discord]: https://discord.gg/Ww9hbqr
+## Making a release
+
+Install and use `craft`: https://github.com/getsentry/craft
+
+Make sure the `CHANGELOG.md` is update and latest `master` contains all changes.
+
+Run:
+
+```bash
+craft prepare x.x.x
+```
+
+Where `x.x.x` stands for the version you want to release.
+Afterwards reach out to an employee of Sentry, they will cut a release by running the `publish` process of `craft`.
